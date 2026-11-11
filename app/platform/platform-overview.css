@@ -1,0 +1,223 @@
+body:has(.convergence-platform)::after {
+  display: none;
+}
+
+.convergence-platform {
+  --convergence-blue: #1480c4;
+  --convergence-green: #30914d;
+  --convergence-purple: #362665;
+  --convergence-magenta: #a92ca7;
+  --lca68-purple-bright: #dbb5ff;
+  background: #fff;
+  color: var(--campaign-ink);
+  font-family: var(--campaign-sans);
+}
+
+.convergence-platform > .p68-header {
+  position: relative;
+  background: #fff;
+  color: var(--campaign-ink);
+  border-bottom: 1px solid var(--campaign-line);
+}
+
+.convergence-platform > .p68-header > .lca68-menu {
+  color: var(--campaign-ink);
+}
+
+.convergence-platform :focus-visible {
+  outline: 2px solid var(--convergence-purple);
+  outline-offset: 6px;
+}
+
+.convergence-platform .lca68-drawer :focus-visible {
+  outline-color: #dbb5ff;
+}
+
+.platform76-content {
+  width: min(1240px, calc(100% - 96px));
+  margin-inline: auto;
+  padding-bottom: 100px;
+}
+
+.platform76-intro {
+  padding: 58px 0 36px;
+}
+
+.platform76-intro > p {
+  margin: 0 0 16px;
+  font: 700 12px/1.5 var(--campaign-sans);
+  letter-spacing: 0;
+  color: #625d68;
+}
+
+.platform76-intro h1 {
+  margin: 0;
+  font: 700 64px/1.1 var(--campaign-sans);
+  letter-spacing: 0;
+}
+
+.platform76-intro > .platform76-intro-guide {
+  margin: 16px 0 0;
+  font: 400 15px/1.6 var(--campaign-sans);
+}
+
+.platform76-row {
+  padding-block: 38px;
+  scroll-margin-top: 24px;
+}
+
+.platform76-row-main {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 64px;
+}
+
+.platform76-row:nth-child(4n + 1) { --platform-color: var(--convergence-blue); }
+.platform76-row:nth-child(4n + 2) { --platform-color: var(--convergence-green); }
+.platform76-row:nth-child(4n + 3) { --platform-color: var(--convergence-purple); }
+.platform76-row:nth-child(4n) { --platform-color: var(--convergence-magenta); }
+
+.platform76-row:nth-child(even) .platform76-photo {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.platform76-row:nth-child(even) .platform76-copy {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.platform76-photo {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  margin: 0;
+  overflow: hidden;
+  border: 10px solid var(--platform-color);
+  border-radius: 24px;
+  background: var(--platform-color);
+}
+
+.platform76-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+#civil-liberties .platform76-photo img {
+  object-position: center 30%;
+}
+
+.platform76-copy {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
+.platform76-copy h2 {
+  margin: 0;
+  font: 500 48px/1.14 var(--campaign-serif);
+  letter-spacing: 0;
+  text-wrap: pretty;
+}
+
+.platform76-message {
+  max-width: 440px;
+  margin: 24px 0 0;
+  font: 400 16px/1.8 var(--campaign-sans);
+  letter-spacing: 0;
+  color: #59545e;
+}
+
+@media (max-width: 1100px) {
+  .platform76-content { width: calc(100% - 64px); }
+  .platform76-row { padding-block: 30px; }
+  .platform76-row-main { gap: 40px; }
+  .platform76-copy { padding-inline: 0; }
+  .platform76-copy h2 { font-size: 39px; }
+  .platform76-message { font-size: 15px; margin-top: 18px; }
+}
+
+@media (max-width: 700px) {
+  .platform76-content { width: calc(100% - 40px); padding-bottom: 64px; }
+  .platform76-intro { padding: 38px 0 30px; }
+  .platform76-intro h1 { font-size: 44px; }
+  .platform76-intro > p { font-size: 11px; margin-bottom: 12px; }
+  .platform76-row { padding: 0 0 58px; }
+  .platform76-row-main { grid-template-columns: minmax(0, 1fr); gap: 25px; }
+  .platform76-row:last-child { padding-bottom: 0; }
+  .platform76-row:nth-child(even) .platform76-photo,
+  .platform76-row:nth-child(even) .platform76-copy { grid-column: auto; grid-row: auto; }
+  .platform76-photo { border-width: 8px; border-radius: 20px; }
+  .platform76-copy h2 { font-size: 36px; }
+  .platform76-message { max-width: 100%; }
+}
+
+.platform76-summary.has-policy {
+  margin-top: 24px;
+}
+.platform76-summary.has-policy .platform76-message { margin: 0; }
+.housing-policy-toggle {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-top: 16px;
+  margin-left: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.housing-policy-toggle img { width: 60px; height: 60px; object-fit: contain; }
+.housing-policy-toggle:hover, .housing-policy-toggle[aria-expanded="true"] {
+  background: color-mix(in srgb, var(--platform-color) 12%, white);
+}
+.housing-policy-toggle:hover { transform: translateY(-2px); }
+.housing-policy-reveal { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .35s ease, opacity .25s ease; }
+.housing-policy-reveal.is-expanded { grid-template-rows: 1fr; opacity: 1; }
+.housing-policy-clip { min-height: 0; overflow: hidden; }
+.housing-policy-content { margin-top: 36px; padding: 36px 40px 40px; border-top: 2px solid var(--platform-color); background: color-mix(in srgb, var(--platform-color) 6%, white); }
+#housing { --policy-photo: url("/Convergence-76/images/convergence-platform/housing-panel.jpg"); }
+#business-and-enterprise { --policy-photo: url("/Convergence-76/images/convergence-platform/business-and-enterprise-panel.jpg"); }
+#transport { --policy-photo: url("/Convergence-76/images/convergence-platform/transport-panel.jpg"); }
+#education { --policy-photo: url("/Convergence-76/images/convergence-platform/education-panel.jpg"); }
+#healthcare { --policy-photo: url("/Convergence-76/images/convergence-platform/healthcare-panel.jpg"); }
+#civil-liberties { --policy-photo: url("/Convergence-76/images/convergence-platform/civil-liberties-panel.jpg"); }
+#diplomacy { --policy-photo: url("/Convergence-76/images/convergence-platform/diplomacy-panel.jpg"); }
+#defense { --policy-photo: url("/Convergence-76/images/convergence-platform/defense-army-panel.jpg"); }
+
+.housing-policy-content {
+  position: relative;
+  isolation: isolate;
+  background: color-mix(in srgb, var(--platform-color) 10%, white);
+}
+.housing-policy-content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--policy-photo, none) center / cover no-repeat;
+  filter: grayscale(1);
+  mix-blend-mode: multiply;
+  opacity: .19;
+}
+.housing-policy-content h3 { margin: 0 0 20px; font: 500 32px/1.25 var(--campaign-serif); letter-spacing: 0; }
+.housing-policy-intro { max-width: 850px; margin: 0 0 32px; font: 400 17px/1.8 var(--campaign-sans); }
+.housing-policy-commitments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 48px; padding: 0; margin: 0; list-style: none; }
+.housing-policy-commitments li { border-top: 1px solid #cbdde8; padding-top: 20px; }
+.housing-policy-commitments h4 { margin: 0 0 10px; font: 700 16px/1.5 var(--campaign-sans); letter-spacing: 0; }
+.housing-policy-commitments p { margin: 0; font: 400 15px/1.8 var(--campaign-sans); color: #59545e; }
+@media (max-width: 700px) {
+  .platform76-summary.has-policy { margin-top: 18px; gap: 12px; }
+  .housing-policy-content { margin-top: 28px; padding: 26px 20px; }
+  .housing-policy-content h3 { font-size: 28px; }
+  .housing-policy-intro { font-size: 15px; }
+  .housing-policy-commitments { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .housing-policy-reveal, .housing-policy-toggle { transition: none; }
+  .housing-policy-toggle:hover { transform: none; }
+}

@@ -1,0 +1,193 @@
+
+document.addEventListener('DOMContentLoaded', () => {
+  // All priority content is server-rendered; only the active panel is exposed.
+  document.querySelectorAll('.priority-explorer').forEach(explorer => {
+    const tabs = Array.from(explorer.querySelectorAll('[role="tab"]'));
+    const panels = Array.from(explorer.querySelectorAll('[role="tabpanel"]'));
+    const selectPriority = index => {
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+      });
+      panels.forEach(panel => {
+        panel.hidden = panel.id !== tabs[index].getAttribute('aria-controls');
+      });
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectPriority(index));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1
+          : (index + (event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 1) + tabs.length) % tabs.length;
+        selectPriority(next);
+        tabs[next].focus();
+      });
+    });
+    if (tabs.length) selectPriority(Math.max(0, tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true')));
+  });
+
+  const policyButtons = [...document.querySelectorAll('.housing-policy-toggle')];
+  policyButtons.forEach(button => button.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    policyButtons.forEach(control => {
+      const expanded = control === button && open;
+      const panel = document.getElementById(control.getAttribute('aria-controls'));
+      control.setAttribute('aria-expanded', String(expanded));
+      const label = control.getAttribute('aria-label').replace(/^(Read|Close)/, expanded ? 'Close' : 'Read');
+      control.setAttribute('aria-label', label);
+      control.title = label;
+      panel?.classList.toggle('is-expanded', expanded);
+      panel?.setAttribute('aria-hidden', String(!expanded));
+      panel?.toggleAttribute('inert', !expanded);
+    });
+  }));
+
+  const menu = document.querySelector('.menu-button');
+  const nav = document.querySelector('.nav');
+  menu?.addEventListener('click', () => {
+    const open = nav?.classList.toggle('open') ?? false;
+    menu.setAttribute('aria-expanded', String(open));
+  });
+
+  const campaignMenu = document.querySelector('.lca68-menu');
+  const campaignScrim = document.querySelector('.lca68-menu-scrim');
+  const campaignDrawer = document.querySelector('.lca68-drawer');
+  const platformTrigger = document.querySelector('.lca68-drawer-platform-trigger');
+  const platformGroup = platformTrigger?.closest('.lca68-drawer-group');
+  const platformSubmenu = platformGroup?.querySelector('.lca68-drawer-submenu');
+  const platformLinks = Array.from(platformSubmenu?.querySelectorAll('a') ?? []);
+  const contactGroup = document.querySelector('.lca68-contact-group');
+  const contactTrigger = document.querySelector('.lca68-drawer-contact-trigger');
+  const contactPanel = document.querySelector('.lca68-contact-panel');
+  const contactForm = contactPanel?.querySelector('form');
+  const contactInput = contactPanel?.querySelector('input');
+  const contactStatus = contactPanel?.querySelector('[role="status"]');
+  let returnFocus = null;
+  let previousOverflow = '';
+  const setPlatformMenu = open => {
+    if (open) setContactMenu(false);
+    platformGroup?.classList.toggle('is-expanded', open);
+    platformTrigger?.setAttribute('aria-expanded', String(open));
+    platformSubmenu?.setAttribute('aria-hidden', String(!open));
+    platformSubmenu?.toggleAttribute('inert', !open);
+    platformLinks.forEach(link => link.tabIndex = open ? 0 : -1);
+  };
+  const setContactMenu = open => {
+    contactGroup?.classList.toggle('is-expanded', open);
+    contactTrigger?.setAttribute('aria-expanded', String(open));
+    contactPanel?.setAttribute('aria-hidden', String(!open));
+    contactPanel?.toggleAttribute('inert', !open);
+    if (contactInput) contactInput.tabIndex = open ? 0 : -1;
+    if (open) setPlatformMenu(false);
+  };
+  const setCampaignMenu = (open, showPlatforms = false) => {
+    const wasOpen = campaignDrawer?.classList.contains('is-open');
+    if (open && !wasOpen) {
+      returnFocus = document.activeElement;
+      previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+    }
+    campaignMenu?.classList.toggle('is-open', open);
+    campaignScrim?.classList.toggle('is-open', open);
+    campaignDrawer?.classList.toggle('is-open', open);
+    campaignMenu?.setAttribute('aria-expanded', String(open));
+    campaignMenu?.setAttribute('aria-label', open ? 'Close campaign menu' : 'Open campaign menu');
+    campaignScrim?.setAttribute('tabindex', '-1');
+    campaignDrawer?.setAttribute('aria-hidden', String(!open));
+    campaignDrawer?.toggleAttribute('inert', !open);
+    if (!open || showPlatforms) setPlatformMenu(open && showPlatforms);
+    if (!open) setContactMenu(false);
+    if (open && !wasOpen) requestAnimationFrame(() => (platformTrigger ?? campaignDrawer?.querySelector('nav a'))?.focus({ preventScroll: true }));
+    if (!open && wasOpen) {
+      document.body.style.overflow = previousOverflow;
+      if (returnFocus?.isConnected) returnFocus.focus({ preventScroll: true });
+    }
+  };
+  campaignMenu?.addEventListener('click', () => setCampaignMenu(!campaignMenu.classList.contains('is-open')));
+  campaignScrim?.addEventListener('click', () => setCampaignMenu(false));
+  platformTrigger?.addEventListener('click', () => setPlatformMenu(!platformGroup?.classList.contains('is-expanded')));
+  contactTrigger?.addEventListener('click', () => setContactMenu(!contactGroup?.classList.contains('is-expanded')));
+  contactForm?.addEventListener('submit', event => {
+    event.preventDefault();
+    if (contactStatus) contactStatus.textContent = 'Thanks. We’ll be in touch.';
+  });
+  platformGroup?.addEventListener('mouseenter', () => setPlatformMenu(true));
+  platformGroup?.addEventListener('mouseleave', () => {
+    if (!platformGroup.contains(document.activeElement)) setPlatformMenu(false);
+  });
+  platformGroup?.addEventListener('focusout', event => {
+    if (!platformGroup.contains(event.relatedTarget)) setPlatformMenu(false);
+  });
+  platformGroup?.addEventListener('keydown', event => {
+    if ((event.key === 'ArrowDown' || event.key === 'ArrowRight') && event.target === platformTrigger) {
+      event.preventDefault();
+      setPlatformMenu(true);
+      platformLinks[0]?.focus();
+    }
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      setPlatformMenu(false);
+      platformTrigger?.focus();
+    }
+  });
+  campaignDrawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setCampaignMenu(false)));
+  document.addEventListener('keydown', event => {
+    if (!campaignDrawer?.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setCampaignMenu(false);
+    }
+    if (event.key !== 'Tab') return;
+    const drawerControls = Array.from(campaignDrawer.querySelectorAll('a[href], button:not([disabled]), input:not([disabled])'))
+      .filter(element => element.tabIndex >= 0 && !element.closest('[inert]'));
+    const controls = [campaignMenu, ...drawerControls].filter(Boolean);
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || !controls.includes(active))) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && (active === last || !controls.includes(active))) {
+      event.preventDefault();
+      first?.focus();
+    }
+  });
+  setPlatformMenu(false);
+  setContactMenu(false);
+
+  const campaignVideo = document.querySelector('.lca68-video');
+  const musicButton = document.querySelector('.lca68-music');
+  const musicBars = musicButton?.querySelector('.lca68-music-bars');
+  const musicLabel = musicButton?.querySelector('b');
+  const updateMusic = muted => {
+    musicBars?.classList.toggle('is-muted', muted);
+    if (musicLabel) musicLabel.textContent = muted ? 'Music off' : 'Music on';
+    musicButton?.setAttribute('aria-label', muted ? 'Turn background music on' : 'Turn background music off');
+    musicButton?.setAttribute('aria-pressed', String(!muted));
+  };
+  const playVideo = async () => {
+    if (!campaignVideo) return;
+    try {
+      await campaignVideo.play();
+    } catch {
+      campaignVideo.muted = true;
+      updateMusic(true);
+      try { await campaignVideo.play(); } catch {}
+    }
+  };
+  void playVideo();
+  musicButton?.addEventListener('click', async () => {
+    if (!campaignVideo) return;
+    campaignVideo.muted = !campaignVideo.muted;
+    campaignVideo.volume = 0.65;
+    updateMusic(campaignVideo.muted);
+    if (!campaignVideo.muted) await playVideo();
+  });
+  if (campaignVideo) {
+    campaignVideo.addEventListener('volumechange', () => updateMusic(campaignVideo.muted));
+    updateMusic(campaignVideo.muted);
+  }
+
+  if (location.hash) requestAnimationFrame(() => document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({block:'start'}));
+});

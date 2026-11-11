@@ -176,7 +176,32 @@ document.addEventListener('DOMContentLoaded', () => {
       try { await campaignVideo.play(); } catch {}
     }
   };
-  void playVideo();
+  if (campaignVideo?.dataset.stream) {
+    campaignVideo.muted = true;
+    const fallback = () => {
+      campaignVideo.src = campaignVideo.dataset.fallback;
+      void playVideo();
+    };
+    if (window.Hls?.isSupported()) {
+      const hls = new window.Hls({ startLevel: 0, capLevelToPlayerSize: true });
+      hls.on(window.Hls.Events.MANIFEST_PARSED, () => { void playVideo(); });
+      hls.on(window.Hls.Events.ERROR, (_event, error) => {
+        if (!error.fatal) return;
+        hls.destroy();
+        fallback();
+      });
+      hls.loadSource(campaignVideo.dataset.stream);
+      hls.attachMedia(campaignVideo);
+    } else if (campaignVideo.canPlayType('application/vnd.apple.mpegurl')) {
+      campaignVideo.addEventListener('error', fallback, { once: true });
+      campaignVideo.src = campaignVideo.dataset.stream;
+      void playVideo();
+    } else {
+      fallback();
+    }
+  } else {
+    void playVideo();
+  }
   musicButton?.addEventListener('click', async () => {
     if (!campaignVideo) return;
     campaignVideo.muted = !campaignVideo.muted;

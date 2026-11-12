@@ -37,10 +37,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const label = control.getAttribute('aria-label').replace(/^(Read|Close)/, expanded ? 'Close' : 'Read');
       control.setAttribute('aria-label', label);
       control.title = label;
+      control.closest('.platform76-row')?.classList.toggle('policy-open', expanded);
       panel?.classList.toggle('is-expanded', expanded);
       panel?.setAttribute('aria-hidden', String(!expanded));
       panel?.toggleAttribute('inert', !expanded);
     });
+    if (open && matchMedia('(min-width: 1050px)').matches && !button.closest('.policy-below')) {
+      document.getElementById(button.getAttribute('aria-controls'))?.querySelector('.platform76-policy-close')?.focus({ preventScroll: true });
+    }
+  }));
+  document.querySelectorAll('.platform76-policy-close').forEach(close => close.addEventListener('click', () => {
+    const button = close.closest('.platform76-row')?.querySelector('.housing-policy-toggle');
+    button?.click();
+    button?.focus({ preventScroll: true });
   }));
 
   const menu = document.querySelector('.menu-button');
